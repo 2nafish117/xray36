@@ -1,0 +1,13 @@
+installation:
+	install vs2017
+	install cmake
+	install cuda 10.0 (make sure visual studio version supported by cuda)
+	install coresponding cudnn
+	pip install dlib --verbose
+
+To check installation:
+	import dlib
+	dlib.DLIB_USE_CUDA
+	True
+	dlib.cuda.get_num_devices() >= 1
+	True

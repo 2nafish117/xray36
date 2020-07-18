@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='scripts/api.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/player.js') }}"></script>
+
+
+  <script>
+    // var video_to_play = "";
+    // function selectMovie(event) {
+    //   // event.preventDefault()
+    //   // console.log(event.target.innerHTML)
+    //   console.log(event)
+    //   // console.log(event.target.alt)
+    //   console.log('im here')
+    //   var myPlayer = videojs('my-video');
+    //   var path = "{{ url_for('static', filename='')}}"
+    //   console.log(path)
+    //   // myPlayer.src(path + )
+    // }
+
+    function getMovies() {
+      var movies;
+      xray.movies.get('all').then(res => {
+        movies = res
+        movie_grid = document.getElementById("movie-grid")
+        console.log(movies)
+        
+        for(var movie of movies) {
+          var img = document.createElement("img")
+          img.src = tmdb_profile_root + movie.poster_path
+          img.width = "200"
+          img.alt = movie.video_path
+          var label = document.createElement('label')
+          label.innerHTML = movie.movie_name
+          var vid_label = document.createElement('label')
+          vid_label.innerHTML = movie.video_path
+
+          var div = document.createElement("div")
+          div.className = "img-with-text"
+          div.appendChild(img)
+          div.appendChild(label)
+          div.appendChild(vid_label)
+
+          console.log(movie['_id']['$oid'])
+          var a = document.createElement("a")
+          a.href = "{{ url_for('watch', id='')}}" + movie['_id']['$oid']
+          // a.onclick = selectMovie
+          a.appendChild(div)
+          var element = document.createElement("div")
+          element.className = "grid-item"
+          element.appendChild(a)
+          movie_grid.appendChild(element)
+        }
+      })
+      
+    }
+
+    getMovies()
+  </script>
+
+</head>
+<body>
+
+  <!-- <div class="movie-page">
+    <div style="align-content: center;"></div>
+    <video id="my-video" class="video-js" controls preload="auto" width="760" height="400" data-setup="{}">
+      <source id="important-id" src="{{ url_for('static', filename='videos/lotr_frodo_sam.mp4') }}" type="video/mp4" />
+      <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider upgrading to a
+        web browser that
+        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+      </p>
+    </video>
+    </div> -->
+
+<h1>Movies</h1>
+<!-- <button type="button" onclick="getMovies()">Try it</button> -->
+<div id="movie-grid" class="grid-container">
+  <!-- <div class="grid-item"><a><img src="../cast/Billy Boyd.png" width="200" ></a></div>
+  <div class="grid-item"><a><img src="../cast/Billy Boyd.png" width="200" ><label>billy</label></a></div>
+  <div class="grid-item"><a><img src="../cast/Billy Boyd.png" width="200" ><label>billy</label></a></div> -->
+</div>
+</div>
+<!-- <p id="some"></p> -->
+<!-- <script>
+    var player = document.getElementById('important-id')
+    // player.src = event
+    var path = 'videos/3idiots.mp4'
+    player.src = "{{ url_for('static', filename=path) }}"
+</script> -->
+
+<!-- <p>Set the <em>display</em> property to <em>grid</em> to make a block-level grid container.</p>
+ -->
+ <script src="https://vjs.zencdn.net/7.8.2/video.js"></script>
+ <link href="https://vjs.zencdn.net/7.8.2/video-js.css" rel="stylesheet" />
+ 
+</body>
+</html>

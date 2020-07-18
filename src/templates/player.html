@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Xray</title>
+
+    <head>
+        <!-- <link href="https://vjs.zencdn.net/7.6.6/video-js.css" rel="stylesheet" /> -->
+
+        <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+        <script src="player.js"></script>
+        <!-- <script src="api.js"></script> -->
+        <script>
+            var shots = null;
+            var scene = 1;
+            // const http = new XMLHttpRequest()
+
+            // http.open("GET", "http://127.0.0.1:5000/xray/sherlock")
+            // http.send()
+
+            // http.onload = () => console.log(http.responseText)
+            fetch('http://127.0.0.1:5000/xray/lotr')
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log(data.shots);
+                    shots = data.shots;
+                });
+        </script>
+
+        <script>
+            function getHMS(sec) {
+                var hours = Math.floor(sec / 60 * 60);
+                var minutes = Math.floor(sec / 60);
+                var seconds = truncateDecimals(sec - minutes * 60, 3)
+                var h = hours < 10 ? "0" + hours : hours;
+                var m = minutes < 10 ? "0" + minutes : minutes;
+                var s = seconds < 10 ? "0" + seconds : seconds;
+                return h + ":" + m + ":" + s;
+            }
+
+            truncateDecimals = function (number, digits) {
+                var multiplier = Math.pow(10, digits),
+                    adjustedNum = number * multiplier,
+                    truncatedNum = Math[adjustedNum < 0 ? 'ceil' : 'floor'](adjustedNum);
+
+                return truncatedNum / multiplier;
+            };
+        </script>
+
+    </head>
+</head>
+
+<body>
+    <div>
+        <label style="font-family: Arial, Helvetica, sans-serif; font-size: 30px;">lord of the rings: the fellowship of
+            the ring</label>
+    </div>
+    <div style="display: flex;">
+        <video id="my-video" class="video-js" controls preload="auto" width="760" height="400" data-setup="{}">
+            <source src="../videos/lotr_bilbo_gandalf.mp4" type="video/mp4" />
+            <!-- <source src="MY_VIDEO.webm" type="video/webm" /> -->
+            <p class="vjs-no-js">
+                To view this video please enable JavaScript, and consider upgrading to a
+                web browser that
+                <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+            </p>
+        </video>
+        <p>time</p>
+        <div id="timer"> </div>
+
+        <script>
+
+            function createActor(actor) {
+                if (actor == "")
+                    return "";
+                var src = "../cast/" + actor + ".png";
+                console.log(actor)
+                return '<li><img style="border-radius: 30px" src="../cast/' + src + '" height="70" width="70"></li>'
+            }
+
+            function createActorList(actors) {
+                var str = "";
+                for (var i = 0; i < actors.length; i++) {
+                    str += createActor(actors[i]);
+                }
+                return str;
+            }
+
+            document.getElementById("my-video").addEventListener('timeupdate', function () {
+                document.getElementById("timer").innerHTML = this.currentTime;
+                currentTime = this.currentTime;
+                var hms = getHMS(currentTime)
+                var video_time = shots[scene].startframe * 1 / 23.98;
+                if (currentTime >= video_time) {
+                    console.log(video_time)
+                    scene += 1;
+                    document.getElementById("actor-list").innerHTML = createActorList(shots[scene].actors)
+                }
+            });
+        </script>
+
+        <div>
+            <label style="font-family: Helvetica, sans-serif; font-size: 30px;">actors</label><br>
+            <ul id="actor-list" style="list-style: none;">
+                <!-- <li>
+            <img style="border-radius: 30px" src="../cast/Omi Vaidya.png" height="70" width="70">
+            <label style="font-family: Arial, Helvetica, sans-serif;">name: omi vaidya</label><br>
+            <label style="font-family: Arial, Helvetica, sans-serif;">age: 38</label><br>
+            <label style="font-family: Arial, Helvetica, sans-serif;">charecter: Chatur 'Silencer' Ramalingam</label>
+          </li> -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- <script src="https://vjs.zencdn.net/7.6.6/video.js"></script> -->
+</body>
+
+</html>

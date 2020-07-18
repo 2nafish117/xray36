@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='scripts/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/player.js') }}"></script>
+</head>
+<body>
+    <script>
+        var shots = null;
+        var shot_list = null;
+        var shot_index = 0;
+
+        var id = '{{id}}';
+        console.log(id)
+        console.log("{{ url_for('browse') }}")
+        xray.movies.get(id).then(res => {
+            // console.log(res[0])
+            var movie = res[0]
+            document.getElementById('movie-title').innerHTML = String(movie['movie_name'])
+            document.getElementById('movie-description').innerHTML = movie.overview
+            document.getElementById('my-video').src = "{{url_for('static', filename='')}}" + movie.video_path
+            xray.shots.get(id).then(res => {
+                shots = res
+                shot_list = shots.shot_list
+            })
+        })
+    </script>
+
+    <h1 id="movie-title">dg</h1>
+    <a href="{{ url_for('browse') }}"><label>browse</label></a>
+    <div class="video-port">
+
+        <video id="my-video" class="video-js" controls preload="auto" width="760" height="400" data-setup="{}">
+            <p class="vjs-no-js">
+                To view this video please enable JavaScript, and consider upgrading to a
+                web browser that
+                <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+            </p>
+        </video>
+
+        <div id="actor-widget-id" class="actor-widget">
+            <!-- <div class="actor-item">
+                <img src="{{ url_for('static', filename='test.png') }}" height="100">
+                <label>test label</label>
+                <label>test label</label>
+            </div>
+            <div class="actor-item">
+                <img src="{{ url_for('static', filename='test.png') }}" height="100">
+                <label>test label</label>
+                <label>test label</label>
+            </div>
+            <div class="actor-item">
+                <img src="{{ url_for('static', filename='test.png') }}" height="100">
+                <label>test label</label>
+                <label>test label</label>
+            </div>
+            <div class="actor-item">
+                <img src="{{ url_for('static', filename='test.png') }}" height="100">
+                <label>test label</label>
+                <label>test label</label>
+            </div> -->
+        </div>
+
+    </div>
+    <div id="movie-description" class="movie-description"></div>
+    <script>
+        var widget = document.getElementById('actor-widget-id')
+        function getShotIndex(t) {
+            for(let i = 0;i < shot_list.length;i += 1) {
+                let shot = shot_list[i]
+                if(shot.start_time <= t && t < shot.end_time)
+                    return i
+            }
+
+            return -1
+        }
+
+        function makeWidgetItem(actor) {
+            var name = document.createElement('label')
+            name.innerHTML = actor.name
+            var pic = document.createElement('img')
+            pic.src = tmdb_profile_root + actor.profile_path
+            pic.width = 100
+
+            var div = document.createElement('div')
+            div.className = "actor-item"
+            div.appendChild(pic)
+            div.appendChild(name)
+            return div
+        }
+
+        function updateActorWidget(actors) {
+            // console.log('updated')
+            console.log(actors)
+            console.log(actors.length)
+            var widget = document.getElementById('actor-widget-id')
+            for(let i = 0;i < actors.length;++i) {
+                var actor = actors[i]
+                console.log(actor)
+                widget.appendChild(makeWidgetItem(actor))
+            }
+        }
+
+        var player = document.getElementById('my-video')
+        player.addEventListener("timeupdate", function(){
+            let t = this.currentTime
+            let new_shot_index = getShotIndex(t)
+            if(new_shot_index != -1 && new_shot_index != shot_index) {
+                console.log("new shot")
+                widget.innerHTML = ""
+                shot_index = new_shot_index
+                let shot = shot_list[shot_index]
+                if(shot.actors_in_shot.length > 0) {
+                    var actors_in_shot = []
+                    for(let actor of shot.actors_in_shot) {
+                        xray.actors.get(actor['$oid']).then(res => {
+                            // actors_in_shot.push(res)
+                            var actor = res
+                            widget.appendChild(makeWidgetItem(actor))
+                        })
+                    }
+                    // updateActorWidget([...actors_in_shot])
+                }
+            }
+        });
+    </script>
+</body>
+</html>
